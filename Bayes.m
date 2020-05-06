@@ -5,7 +5,8 @@ clc;
 Nc=50;
 w=4;
 n=5;
-N = [15 5 21 5] * 5;
+N = [15 5 25 5];
+
 
 %% 数据
 % 读取数据
@@ -29,10 +30,10 @@ testD=[10 4 3 33 6;14.7 3.8 10.5 2.7 0.2;6.7 10 11 71 3.9;0.33 0.26 0.04 0.27 0]
 % 归一化对结果无影响
 % 使用归一化会降低准确率（失去了含量特征）
 
-A = parse(A);
-B = parse(B);
-C = parse(C);
-D = parse(D);
+% A = parse(A,6);
+% B = parse(B,20);
+% C = parse(C,5);
+% D = parse(D,20);
 
 test_data={testA,testB,testC,testD};
 testN=[6 2 13 4];
@@ -68,16 +69,20 @@ correct2 = 0;
 total = 0;
 for i=1:4
     disp(i);
-%sample=cell2mat(test_data(i))
-%count = testN(i);
-sample=cell2mat(data(i))
-count = N(i);
+sample=cell2mat(test_data(i))
+count = testN(i);
+% sample=cell2mat(data(i))
+% count = N(i);
 for k=1:count
-    P1=-1/2*(sample(k,:)'-X1)'*S1_*(sample(k,:)'-X1)+log(PW1)-1/2*log(S11);
-    P2=-1/2*(sample(k,:)'-X2)'*S2_*(sample(k,:)'-X2)+log(PW2)-1/2*log(S22);
-    P3=-1/2*(sample(k,:)'-X3)'*S3_*(sample(k,:)'-X3)+log(PW3)-1/2*log(S33);
-    %P4=-1/2*(sample(k,:)'-X4)'*S4_*(sample(k,:)'-X4)+log(PW4)-1/2*log(S44);
-    P=[ P1 P2 P3 ];
+%     P1=-1/2*(sample(k,:)'-X1)'*S1_*(sample(k,:)'-X1)+log(PW1)-1/2*log(S11);
+%     P2=-1/2*(sample(k,:)'-X2)'*S2_*(sample(k,:)'-X2)+log(PW2)-1/2*log(S22);
+%     P3=-1/2*(sample(k,:)'-X3)'*S3_*(sample(k,:)'-X3)+log(PW3)-1/2*log(S33);
+%     P4=-1/2*(sample(k,:)'-X4)'*S4_*(sample(k,:)'-X4)+log(PW4)-1/2*log(S44);
+    P1 = back(sample,k,X1,S1_,PW1,S11);
+    P2 = back(sample,k,X2,S2_,PW2,S22);
+    P3 = back(sample,k,X3,S3_,PW3,S33);
+    P4 = back(sample,k,X4,S4_,PW4,S44);
+    P=[ P1 P2 P3 P4]
     Pmax=max(P);
     w=0;
     if P1==max(P)
@@ -115,5 +120,7 @@ disp('正确率');
 correct2/total
 correct/total
 
-% 故障识别   类型识别  （左：学习样本；右：训练样本）
+% 故障识别   类型识别  （左：学习样本；右：测试样本）
 % 0.8913 0.84     0.5870 0.52
+% 0.9 0.84              0.6 0.52   提高C的样本数
+% 0.9 0.84              0.66 0.52   P1=(-1*(sample(k,:)'-X1)'*S1_*(sample(k,:)'-X1))+(log(PW1)-1/2*log(S11));
