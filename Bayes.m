@@ -18,14 +18,15 @@ testB=[293 50 13 115 120;443 85 9.5 103 174];
 testC=[73 520 140 1200 6;42 97 157 600 0;766 993 116 665 4;16 237 92 470 0;15 125 29 574 7;120 120 33 84 0.55;5 217 69 523 6;0 434 226 387 0;2844 8517 4422 10196 39;117 357 92 468 4;80 153 42 276 18;86 110 18 92 7.4;8 631 254 2020 39];
 testD=[10 4 3 33 6;14.7 3.8 10.5 2.7 0.2;6.7 10 11 71 3.9;0.33 0.26 0.04 0.27 0];
 
-A=normal(A);
-B=normal(B);
-C=normal(C);
-D=normal(D);
-testA=normal(testA);
-testB=normal(testB);
-testC=normal(testC);
-testD=normal(testD);
+% A=normal(A);
+% B=normal(B);
+% C=normal(C);
+% D=normal(D);
+% testA=normal(testA);
+% testB=normal(testB);
+% testC=normal(testC);
+% testD=normal(testD);
+% 归一化对结果无影响
 
 
 test_data={testA,testB,testC,testD};
@@ -58,6 +59,7 @@ PW4=N(4)/Nc;
 %% 测试
 % 测试
 correct = 0;
+correct2 = 0;
 total = 0;
 for i=1:4
     disp(i);
@@ -69,8 +71,8 @@ for k=1:count
     P1=-1/2*(sample(k,:)'-X1)'*S1_*(sample(k,:)'-X1)+log(PW1)-1/2*log(S11);
     P2=-1/2*(sample(k,:)'-X2)'*S2_*(sample(k,:)'-X2)+log(PW2)-1/2*log(S22);
     P3=-1/2*(sample(k,:)'-X3)'*S3_*(sample(k,:)'-X3)+log(PW3)-1/2*log(S33);
-    P4=-1/2*(sample(k,:)'-X4)'*S4_*(sample(k,:)'-X4)+log(PW4)-1/2*log(S44);
-    P=[ P1 P2 P3 P4];
+    %P4=-1/2*(sample(k,:)'-X4)'*S4_*(sample(k,:)'-X4)+log(PW4)-1/2*log(S44);
+    P=[ P1 P2 P3 ];
     Pmax=max(P);
     w=0;
     if P1==max(P)
@@ -95,11 +97,15 @@ for k=1:count
     total = total + 1;
      disp(w);
      if i==w
-         correct = correct + 1;
+        correct = correct +1;
+     end
+     if (i<=3 && w <=3) || (i==4 && w==4)
+         correct2 = correct2 + 1;
      else
          
      end
 end
 end
 disp('正确率');
+correct2/total
 correct/total
