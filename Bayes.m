@@ -17,6 +17,17 @@ testA=[35 25 0 23 22;160 90 27 17 5;565 93 34 47 0;150 53 34 20 0;980 73 58 12 0
 testB=[293 50 13 115 120;443 85 9.5 103 174];
 testC=[73 520 140 1200 6;42 97 157 600 0;766 993 116 665 4;16 237 92 470 0;15 125 29 574 7;120 120 33 84 0.55;5 217 69 523 6;0 434 226 387 0;2844 8517 4422 10196 39;117 357 92 468 4;80 153 42 276 18;86 110 18 92 7.4;8 631 254 2020 39];
 testD=[10 4 3 33 6;14.7 3.8 10.5 2.7 0.2;6.7 10 11 71 3.9;0.33 0.26 0.04 0.27 0];
+
+normal(A);
+normal(B);
+normal(C);
+normal(D);
+normal(testA);
+normal(testB);
+normal(testC);
+normal(testD);
+
+
 test_data={testA,testB,testC,testD};
 testN=[6 2 13 4];
 data = {A B C D};
@@ -57,21 +68,25 @@ for k=1:count
     P2=-1/2*(sample(k,:)'-X2)'*S2_*(sample(k,:)'-X2)+log(PW2)-1/2*log(S22);
     P3=-1/2*(sample(k,:)'-X3)'*S3_*(sample(k,:)'-X3)+log(PW3)-1/2*log(S33);
     P4=-1/2*(sample(k,:)'-X4)'*S4_*(sample(k,:)'-X4)+log(PW4)-1/2*log(S44);
-    P=[ P1 P2 P3 P4];
+    P=[ P1 P2 P3 P4]
     Pmax=max(P);
     w=0;
     if P1==max(P)
         w=1;
-        %plot3(sample(k,1),sample(k,2),sample(k,3),'ro');grid on;hold on;
+        %plot3(sample(k,1),sample(k,2),sample(k,3),'ro')
+        %grid on;hold on
     elseif P2==max(P)
         w=2;
-        %plot3(sample(k,1),sample(k,2),sample(k,3),'b>');grid on;hold on;
+        %plot3(sample(k,1),sample(k,2),sample(k,3),'b>')
+        %grid on;hold on
     elseif  P3==max(P)
       w=3;
-      %plot3(sample(k,1),sample(k,2),sample(k,3),'g+');grid on;hold on;
+      %plot3(sample(k,1),sample(k,2),sample(k,3),'g+')
+      %grid on;hold on
     elseif P4==max(P)
       w=4;
-      %plot3(sample(k,1),sample(k,2),sample(k,3),'y*');grid on;hold on;
+      %plot3(sample(k,1),sample(k,2),sample(k,3),'y*')
+      %grid on;hold on
     else
         disp("Fuck");
     end
