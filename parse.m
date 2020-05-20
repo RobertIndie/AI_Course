@@ -4,6 +4,7 @@ function [res] = parse(A,repeat)
 res = repmat(A,repeat,1); % 复制扩充：无用
 rowrank = randperm(size(res, 1)); % 乱序：无用
 res = res(rowrank, :);
+res = zscore(res);
 % res =A
 end
 
