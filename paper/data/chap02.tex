@@ -1,0 +1,136 @@
+\chapter{网络模型与原理}
+\label{cha:algorithm}
+
+\section{模型概述}
+在神经网络信号的正向传播中，神经元接收到来自其他神经元的输入信号，这些信号乘以权重累加到神经元接收的总输入值上，随后与当前神经元的阈值进行比较，然后通过激活函数处理，产生神经元的输出。理想的激活函数是阶跃函数，然而阶跃函数的缺点是不连续，不可导，所以常用$sigmoid$函数作为误差反向传播神经网络的激活函数。
+
+误差反向传播神经网络的核心思想就是：通过调整各神经元之间的权值，将误差由隐含层向输入层逐层反传，也就是先实现信号的正向传播到误差的反向传播过程。所以误差反向传播神经网络算法的核心步骤如下 ：（1）求得在特定输入下实际输出与理想输出的平方误差函数（误差函数或者叫代价函数）；（2）利用误差函数对神经网络中的阈值以及连接权值进行求导；（3）根据梯度下降算法，对极小值进行逼近，当满足条件时，跳出循环。
+
+在本篇论文中，将使用的是有监督的误差反向传播神经网络。故我们需要提供一个包括输入和期望输出的训练集，以在训练的过程中获得它相对于训练集的误差。正向传播 ：输入样本—输入层—各隐含层—输出层 ；若输出层的实际输出与期望的输出不符，则误差反传 ：误差表示—修正各层神经元的权值 ；直到网络输出的误差减少到可以接受的程度，或者进行到预先设定的学习次数为止。
+
+\section{模型推导}
+
+在反向传播神经网络中，通常选择的是$sigmoid$函数作为激活函数，这类函数的导数有一个很好的性质，就是自身相关。$sigmoid$函数如式~(\ref{equ:algorithm:sigmoid})。
+\begin{equation}
+\label{equ:algorithm:sigmoid}
+sigmoid(x) = \frac{1}{1+e^{-x}}
+\end{equation}
+其导数如式~~(\ref{equ:algorithm:sigmoidDerivative})
+\begin{equation}
+\label{equ:algorithm:sigmoidDerivative}
+sigmoid'(x) = sigmoid(x)(1-sigmoid(x))
+\end{equation}
+假定现有一个四层的神经网络，包括一层输入层、两层隐含层和一层输出层。假定各层的神经元数量分别为：6，4，3，2。接下来对各层的输入和输出变量进行定义，输入至输入层的输入向量如式~(\ref{equ:algorithm:input0})；对应的第一层隐含层的输入向量如式~(\ref{equ:algorithm:input0})；第二层隐含层的输入向量为式~(\ref{equ:algorithm:input0})；输出层的输入向量为式~(\ref{equ:algorithm:input0})\cite{BPNNPrincipleY}
+\begin{equation}
+\label{equ:algorithm:input0}
+Y^{(0)} = [x_1,x_2,\cdots,x_6]^T =[a_1(0),a_2(0),a_3(0),a_4(0),a_5(0),a_6(0)]^T
+\end{equation}
+\begin{equation}
+\label{equ:algorithm:input1}
+Y^{(1)} = [a_1(1),a_2(1),a_3(1),a_4(1)]^T 
+\end{equation}
+\begin{equation}
+\label{equ:algorithm:input2}
+Y^{(2)} = [a_1(2),a_2(2),a_3(2)]^T
+\end{equation}
+\begin{equation}
+\label{equ:algorithm:input3}
+Y^{(3)} = [a_1(3),a_2(3)]^T
+\end{equation}
+假定第$n$层（$n>=2$）神经元的个数为$i$个，第$n-1$层的神经元个数为$j$个，定义第$n$层与第$n-1$层之间的连接权值矩阵如式~(\ref{equ:algorithm:wMatrix})
+\begin{equation}
+\label{equ:algorithm:wMatrix}
+W^{(n)}=\begin{bmatrix}
+w_{11}^{(n)} & \cdots & w_{1j}^{(n)} \\
+\vdots & \cdots & \vdots \\
+w_{i1}^{(n)}& \cdots & w_{ij}^{(n)}
+\end{bmatrix}
+\end{equation}
+定义第$n$层神经元的阈值向量如式~(\ref{equ:algorithm:thetaVector})
+\begin{equation}
+\label{equ:algorithm:thetaVector}
+\theta^{(n)} = [\theta^{(n)}_{(1)},\theta^{(n)}_{(2)},...,\theta^{(n)}_{(n)}]^T 
+\end{equation}
+则第$n$层神经元的输出矩阵如式~(\ref{equ:algorithm:vMatrix})
+\begin{equation}
+\label{equ:algorithm:vMatrix}
+V^{(n)}=W^{(n)}Y^{(n)}+\theta^{n}
+\end{equation}
+第$n$层的输入与第$n-1$层的输出的关系如~(\ref{equ:algorithm:VAndY})
+\begin{equation}
+\label{equ:algorithm:VAndY}
+Y^{(n)}=f(V^{(n-1)})
+\end{equation}
+其中，$f$为激活函数，常使用$sigmoid$函数作为激活函数，故如式~(\ref{equ:algorithm:VAndY_sigmoid})
+\begin{equation}
+\label{equ:algorithm:VAndY_sigmoid}
+Y^{(n)}=sigmoid(V^{(n-1)})
+\end{equation}
+目标是希望通过调整$W$使得输出和目标的误差最小，利用最小二乘思想：
+\begin{equation}
+E = \frac{1}{k}\sum_{l=1}^k(T_l-Y_l^{(n)})^2 =  \frac{1}{k}\sum_{l=1}^k(\delta_l^{(n)})^2
+\end{equation}
+其中，$\delta_l$如式~(\ref{equ:algorithm:delta})
+\begin{equation}
+\label{equ:algorithm:delta}
+\delta_l = (T_l-Y_l^{(n)})
+\end{equation}
+因为误差反向传播神经网络是反馈式网络，所以在更新权值时是从后向前更新的，首先更新的是最后一层的权值。所以有：
+\begin{equation}
+E = \frac{1}{k}\sum_{l=1}^k(T_l-Y_l^{(n)})^2 \\
+= \frac{1}{k}\sum_{l=1}^k(T_l-f(V_l^{(n)}) )^2 \\
+= \frac{1}{k}\sum_{l=1}^k(T_l-\sum_{i=1}^{q}W_{li}^{q}Y_i^{(n-1)})^2
+\end{equation}
+因此$E$和$W$的求导关系为：
+\begin{equation}
+\frac{\partial E}{\partial W_{li}^{(n)}} = \frac{\partial E}{\partial Y_l^{(n)}}\frac{\partial Y_l^{(n)}}{\partial V_l^{(n)}}\frac{\partial V_l^{(n)}}{\partial W_{li}^{(n)}}
+\end{equation}
+其中：
+\begin{equation}
+\label{equ:algorithm:1}
+\frac{\partial E}{\partial Y_l^{(n)}} = (Y_l-T_l) = -\delta_l 
+\end{equation}
+\begin{equation}
+\label{equ:algorithm:2}
+\frac{\partial Y_l^{(n)}}{\partial V_l^{(n)}} = f^{'(n)}(V_l^{(n)})
+\end{equation}
+\begin{equation}
+\label{equ:algorithm:3}
+\frac{\partial V_l^{(n)}}{\partial W_{li}^{(n)}} = Y_i^{(n-1)}
+\end{equation}
+根据式~(\ref{equ:algorithm:1})、式~(\ref{equ:algorithm:2})、式~(\ref{equ:algorithm:3})可得：
+\begin{equation}
+\frac{\partial E}{\partial W_{li}^{(n)}}=-\delta_l f^{'(n)}(V_l^{(n)})  Y_i^{(n-1)}
+\end{equation}
+令
+\begin{equation}
+S^{(n)}=\delta_l f^{'(n)}(V_l^{(n)}) 
+\end{equation}
+故可得：
+\begin{equation}
+\label{key}
+\frac{\partial E}{\partial \theta^{(n)}}=\frac{\partial E}{\partial V^{(n)}}=-S^{(n)}
+\end{equation}
+
+\section{算法流程}
+接下来阐述误差反向传播神经网络的算法流程。第一步随机初始化各层神经元之间的连接权值矩阵；第二步通过式~(\ref{equ:algorithm:vMatrix})计算每层神经元的输出矩阵；第三步求各层神经元的误差：
+\begin{equation}
+\delta =Y^{(n)}-T
+\end{equation}
+第四步对于输出层求得反向传播误差因子：
+\begin{equation}
+S^{(n)}=f(V^{(n)})\delta
+\end{equation}
+对于输出层以前的各层求得反向传播误差因子：
+\begin{equation}
+S^{(n)}=f'^{(n)}(V^{(n)})W^{(n+1)^T}S^{(n+1)}
+\end{equation}
+第五步更新各神经元层与上一层的连接权值矩阵：
+\begin{equation}
+W_{lk}^{(n)}=W_{lk}^{(n-1)}+\eta S_k^{(n)}Y_l^{(n-1)}
+\end{equation}
+\begin{equation}
+\theta_k^{(n)}=\theta_k^{(n-1)}+\eta S_k^{(n)}
+\end{equation}
+判断是否达到条件，如是否达到期望正确率，如未达到条件则返回第二步。
+

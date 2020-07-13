@@ -1,0 +1,12 @@
+\contentsline {chapter}{\numberline {第1章}误差反向传播神经网络概述}{1}{chapter.1}
+\contentsline {chapter}{\numberline {第2章}网络模型与原理}{2}{chapter.2}
+\contentsline {section}{\numberline {2.1}模型概述}{2}{section.2.1}
+\contentsline {section}{\numberline {2.2}模型推导}{2}{section.2.2}
+\contentsline {section}{\numberline {2.3}算法流程}{4}{section.2.3}
+\contentsline {chapter}{\numberline {第3章}网络的Matlab实现}{6}{chapter.3}
+\contentsline {chapter}{\numberline {第4章}神经网络的应用实例}{10}{chapter.4}
+\contentsline {section}{\numberline {4.1}二维分类问题}{10}{section.4.1}
+\contentsline {section}{\numberline {4.2}三维分类问题}{17}{section.4.2}
+\contentsline {chapter}{\numberline {第5章}结论}{25}{chapter.5}
+\contentsline {chapter}{插图索引}{26}{section*.22}
+\contentsline {chapter}{公式索引}{27}{section*.24}

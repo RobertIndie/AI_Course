@@ -1,0 +1,117 @@
+\chapter{网络的Matlab实现}
+\label{cha:matlabCode}
+
+依据上一章节推导得出的算法原理和流程，我们利用Matlab来实现误差方向传播神经网络。\footnote{本文所涉及的所有源码均已放在Github上，地址为：https://github.com/RobertIndie/BPNN}
+
+首先，我们需要创建初始化神经元层间的连接权值矩阵的函数：
+
+\indent
+\begin{lstlisting}
+function [ W ] = init_w( levels )
+% 初始化连接权值矩阵，返回每一层之间的连接权值矩阵
+    n_level = numel(levels) - 1;
+    W = cell(n_level,1);
+    for i=1:n_level
+       W{i} = rand(levels(i+1),levels(i));
+    end
+end
+\end{lstlisting}
+
+接下来创建初始化每层神经元的阈值矩阵的函数：
+
+\begin{lstlisting}
+function [ theta ] = init_theta( levels )
+% 初始化阈值矩阵
+    n_level = numel(levels) - 1;
+    theta = cell(n_level, 1);
+    for i=1:n_level
+       theta{i} = rands(levels(i+1),1); 
+    end
+end
+\end{lstlisting}
+
+接下来创建激活函数，这里我们使用$sigmoid$作为神经网络的激活函数：
+
+\begin{lstlisting}
+function [ y ] = sigmoid( x )
+% sigmoid 函数
+    y = 1./(1+exp(-x));
+end
+\end{lstlisting}
+
+接下来创建神经网络前向传播运算函数：
+
+\begin{lstlisting}
+function [ output,Y] = predict( input, W, theta)
+% 前向传播
+% input: 输入向量
+% W: 连接权值矩阵元胞数组
+% theta: 阈值矩阵
+% output: 输出向量
+% Y: 各层的输出
+    f = @sigmoid;
+    n_w = numel(W);
+    Y = cell(n_w+1, 1);
+    y = input';
+    Y{1}=input';
+    for i=1:n_w
+        V = W{i}*y+theta{i};
+        y = f(V);
+        Y{i+1} = y;
+    end
+    output = y;
+end
+
+\end{lstlisting}
+
+下面是训练神经网络的函数：
+
+\begin{lstlisting}
+function [ W,theta,record ] = train( X, levels, step, min_err, computeErrorFunc )
+% 训练
+% X: 训练集
+% levels: 神经网络结构
+% step: 趋近学习步长
+% min_err: 期望错误率
+% computeErrorFunc: 错误率计算函数
+    r_i = 0;record = zeros(1,10000);% 历史错误率
+    n_levels = size(levels, 2) - 1;
+    n_input = levels(1);
+    W = init_w(levels);
+    theta = init_theta(levels);
+    [n_data,col] = size(X);
+    train_data = X(:,1:n_input); 
+    label = X(:,n_input+1:end)';
+    f = @sigmoid;
+    while true
+        for k=1:n_data
+           [output, Y] =  predict(train_data(k,:), W, theta);
+           delta = label(:,k) - output;
+           % 从最后一层往前更新W
+           for l=n_levels:-1:1
+              net = W{l}*Y{l} + theta{l};
+              if l == n_levels
+                  S = diag(f(net).*(1-f(net)))*delta;
+              else
+                  S = diag((f(net).*(1-f(net))))*W{l+1}'*S;
+              end
+              new_W{l} = W{l} + step*S*Y{l}';
+              new_theta{l} = theta{l} + step*S;
+           end 
+           W = new_W;
+           theta = new_theta;
+        end 
+
+        y = predict(train_data, W, theta);
+        error = computeErrorFunc(y, label)
+        r_i = r_i + 1;
+        record(r_i) = error; % 记录历史错误率
+        if error < min_err
+            break;
+        end
+    end
+    record=record(1,1:r_i);
+end
+\end{lstlisting}
+
+训练的中止条件为达到某一期望的最大错误率，错误率计算函数由函数参数给出。
